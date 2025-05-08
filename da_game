@@ -29,7 +29,7 @@ col = a
 col2 = h
 difficulty = 0 
 score = 0 
-players = 2
+players = 1
 player = 1
 traps = [] 
   
@@ -256,17 +256,27 @@ if players == 2:
     if player == 1:
       for event in sense.stick.get_events():
         if event.action == "pressed":
+          org_x = pl_x
+          org_y = pl_y
           move(event.direction, player)
           weapon(pl_x, pl_y, event.direction)
           player = 2
+          if pl_x == pl2_x and pl_y == pl2_y:
+            pl_x = org_x
+            pl_y = org_y
     elif player == 2:
       for event in sense.stick.get_events():
         if event.action == "pressed":
+          org_2x = pl2_x
+          org_2y = pl2_y
           move(event.direction, player)
           weapon2(pl2_x, pl2_y, event.direction)
           player = 1
+          if pl2_x == pl_x and pl2_y == pl_y:
+            pl2_x = org_2x
+            pl2_y = org_2y
     
     sense.set_pixel(pl_x, pl_y, b)
-    sense.set_pixel(z, w, col)
     sense.set_pixel(pl2_x, pl2_y, c)
+    sense.set_pixel(z, w, col)
     sense.set_pixel(j, k, col2)
