@@ -42,11 +42,11 @@ class Player:
 			self.weapon[0] = check_position(self.weapon[0])
 			self.weapon[1] = check_position(self.weapon[1])
 			
-			def get_position(slef):
-				return self.position
+		def get_position(slef):
+			return self.position
 			
-			def get_weapon(self):
-				return self.weapon
+		def get_weapon(self):
+			return self.weapon
 
 def check_position(position):
 	while position > 7:
@@ -79,6 +79,7 @@ player2 = Player(7, 7, 7, 5, green)
 players = [player1, player2]
 player_turn = 0
 dead = False
+winner = ''
 
 while not dead:
 	current_player = players[player_turn]
