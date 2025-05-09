@@ -1,5 +1,6 @@
 from sense_hat import SenseHat
 from time import sleep
+
 sense = SenseHat()
 
 red = (255, 0, 0)
@@ -9,7 +10,7 @@ black = (0, 0, 0)
 player_colours = [blue, green]
 
 class Player:
-	def _init_(self, x, y, wx, wy, colour):
+	def __init__(self, x, y, wx, wy, colour):
 		self.position = [x, y]
 		self.weapon = [wx, wy]
 		self.colour = colour
@@ -33,18 +34,18 @@ class Player:
 		elif direction == 'down':
 			self.weapon[0] = self.position[0]
 			self.weapon[1] = self.position[1] + 2
-		elif direction == 'up':
+		elif direction == 'left':
 			self.weapon[0] = self.position[0] - 2
 			self.weapon[1] = self.position[1]
-		elif direction == 'up':
+		elif direction == 'right':
 			self.weapon[0] = self.position[0] + 2
 			self.weapon[1] = self.position[1]
 		self.weapon[0] = check_position(self.weapon[0])
 		self.weapon[1] = check_position(self.weapon[1])
-
-	def get_position(slef):
+			
+	def get_position(self):
 		return self.position
-
+			
 	def get_weapon(self):
 		return self.weapon
 
@@ -57,12 +58,18 @@ def check_position(position):
 
 def is_dead(players):
 	global dead, winner
-	if players[0].get_position == players[1].get_weapon():
+	p1_hit = players[0].get_position() == players[1].get_weapon()
+	p2_hit = players[1].get_position() == players[0].get_weapon()
+	if p1_hit and p2_hit:
+		dead = True
+		winner = 'draw'
+	elif p1_hit:
 		dead = True
 		winner = '2'
-	elif players[1].get_position == players[0].get_weapon():
+	elif p2_hit:
 		dead = True
 		winner = '1'
+
 
 def update_display(players):
 	sense.clear()
@@ -83,16 +90,24 @@ winner = ''
 
 while not dead:
 	current_player = players[player_turn]
-	current_weapon = current_player.get_weapon()
-	
-	update_display()	
+	other_player = players[1 - player_turn]
+
+	update_display(players)
 	is_dead(players)
-	
+	if dead:
+		break
+
 	event = sense.stick.wait_for_event()
 	if event.action == 'pressed':
+		original_position = current_player.get_position()[:]
 		current_player.move(event.direction)
+
+		if current_player.get_position() == other_player.get_position():
+			current_player.position = original_position
+			continue
+
 		current_player.fire_weapon(event.direction)
-	
-	player_turn = switch_player(player_turn)
+		update_display(players)
+		player_turn = switch_player(player_turn)
 
 print(winner)
