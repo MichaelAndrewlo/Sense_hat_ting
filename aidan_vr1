@@ -124,11 +124,12 @@ while not dead:
 	starting_weapon_y = current_weapon_y
 	
 	is_dead()
-	for event in sense.stick.get_events():
-		if event.action == 'pressed':
-			move(event.direction)
-			weapon(event.direction)
-			break
+	
+	event = sense.stick.wait_for_event()
+	if event.action == 'pressed':
+		move(event.direction)
+		weapon(event.direction)
+	
 	update_positions()
 	update_display()
 	player = switch_player(player)
