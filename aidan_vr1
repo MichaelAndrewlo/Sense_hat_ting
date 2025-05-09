@@ -1,17 +1,11 @@
 from sense_hat import SenseHat
-from random import randint
 from time import sleep
 sense = SenseHat()
 
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
-yellow = (255, 255, 0)
-gray = (183, 183, 183)
 black = (0, 0, 0)
-pink = (255, 0, 255)
-orange = (255, 153, 0)
-white = (255, 255, 255)
 player_colours = [blue, green]
 
 player_positions = [[0, 0], [7, 7]]
@@ -71,10 +65,7 @@ def update_display(starting_px, starting_py, starting_wx, starting_wy):
 	sense.set_pixel(weapon_positions[player][0], weapon_positions[player][1], red)
 
 def switch_player(p):
-	if p == 0:
-		return 1
-	else:
-		return 0
+	return 1 - p
 
 for i in range(2):
 	sense.set_pixel(player_positions[i][0], player_positions[i][1], player_colours[i])
@@ -93,18 +84,12 @@ while not dead:
 	event = sense.stick.wait_for_event()
 	if event.action == 'pressed':
 		original_position = player_positions[player][:]
-
 		move(event.direction)
-
-		other_player = switch_player(player)
-		if player_positions[player] == player_positions[other_player]:
-			# Revert to original position and skip turn
+		if player_positions[player] == player_positions[1 - player]:
 			player_positions[player] = original_position
 			continue
-
 		weapon(event.direction)
 		update_display(starting_px, starting_py, starting_wx, starting_wy)
 		player = switch_player(player)
 
-sense.show_message(winner)
 print(winner)
