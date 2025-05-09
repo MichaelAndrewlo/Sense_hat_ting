@@ -14,39 +14,39 @@ class Player:
 		self.weapon = [wx, wy]
 		self.colour = colour
 		
-		def move(self, direction):
-			if direction == 'up':
-				self.position[1] -= 1
-			elif direction == 'down':
-				self.position[1] += 1
-			elif direction == 'left':
-				self.position[0] -= 1
-			elif direction == 'right':
-				self.position[0] += 1
-			self.position[0] = check_position(self.position[0])
-			self.position[1] = check_position(self.position[1])
+	def move(self, direction):
+		if direction == 'up':
+			self.position[1] -= 1
+		elif direction == 'down':
+			self.position[1] += 1
+		elif direction == 'left':
+			self.position[0] -= 1
+		elif direction == 'right':
+			self.position[0] += 1
+		self.position[0] = check_position(self.position[0])
+		self.position[1] = check_position(self.position[1])
 		
-		def fire_weapon(self, direction):
-			if direction == 'up':
-				self.weapon[0] = self.position[0]
-				self.weapon[1] = self.position[1] - 2
-			elif direction == 'down':
-				self.weapon[0] = self.position[0]
-				self.weapon[1] = self.position[1] + 2
-			elif direction == 'up':
-				self.weapon[0] = self.position[0] - 2
-				self.weapon[1] = self.position[1]
-			elif direction == 'up':
-				self.weapon[0] = self.position[0] + 2
-				self.weapon[1] = self.position[1]
-			self.weapon[0] = check_position(self.weapon[0])
-			self.weapon[1] = check_position(self.weapon[1])
-			
-		def get_position(slef):
-			return self.position
-			
-		def get_weapon(self):
-			return self.weapon
+	def fire_weapon(self, direction):
+		if direction == 'up':
+			self.weapon[0] = self.position[0]
+			self.weapon[1] = self.position[1] - 2
+		elif direction == 'down':
+			self.weapon[0] = self.position[0]
+			self.weapon[1] = self.position[1] + 2
+		elif direction == 'up':
+			self.weapon[0] = self.position[0] - 2
+			self.weapon[1] = self.position[1]
+		elif direction == 'up':
+			self.weapon[0] = self.position[0] + 2
+			self.weapon[1] = self.position[1]
+		self.weapon[0] = check_position(self.weapon[0])
+		self.weapon[1] = check_position(self.weapon[1])
+
+	def get_position(slef):
+		return self.position
+
+	def get_weapon(self):
+		return self.weapon
 
 def check_position(position):
 	while position > 7:
