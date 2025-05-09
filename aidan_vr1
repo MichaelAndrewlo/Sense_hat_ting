@@ -25,7 +25,7 @@ winner = ''
 def check_position(position):
 	while position >= 8:
 		position -= 1
-	while pos <= -1:
+	while position <= -1:
 		position += 1
 	return position
 	
@@ -50,7 +50,7 @@ def move(direction):
 		current_player_y += 1
 	elif direction == 'left':
 		current_player_x -= 1
-	elif direction == 'right':
+	elif direction == 'right'
 		current_player_x += 1
 	current_player_x = check_position(current_player_x)
 	current_player_y = check_position(current_player_y)
@@ -62,12 +62,16 @@ def weapon(direction):
 	global current_weapon_y
 	if direction == 'up':
 		current_weapon_y = current_player_y - 2
+		current_weapon_x = current_player_x
 	elif direction == 'down':
 		current_weapon_y = current_player_y + 2
+		current_weapon_y = current_player_y
 	elif direction == 'left':
-		current_weapon_x = current_player_x - 2
+		current_weapon_x = current_player_x -= 2
+		current_weapon_y = current_player_y
 	elif direction == 'right':
-		current_weapon_x = current_player_x + 2
+		current_weapon_x = current_player_x += 2
+		current_weapon_y = current_player_y
 	current_weapon_x = check_position(current_weapon_x)
 	current_weapon_y = check_position(current_weapon_y)
 
@@ -122,7 +126,7 @@ while not dead:
 	is_dead()
 	for event in sense.stick.get_events():
 		if event.action == 'pressed':
-			move(event.direction, player)
+			move(event.direction)
 			weapon(event.direction)
 			break
 	update_positions()
