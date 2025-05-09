@@ -50,7 +50,7 @@ def move(direction):
 		current_player_y += 1
 	elif direction == 'left':
 		current_player_x -= 1
-	elif direction == 'right'
+	elif direction == 'right':
 		current_player_x += 1
 	current_player_x = check_position(current_player_x)
 	current_player_y = check_position(current_player_y)
@@ -67,10 +67,10 @@ def weapon(direction):
 		current_weapon_y = current_player_y + 2
 		current_weapon_y = current_player_y
 	elif direction == 'left':
-		current_weapon_x = current_player_x -= 2
+		current_weapon_x = current_player_x - 2
 		current_weapon_y = current_player_y
 	elif direction == 'right':
-		current_weapon_x = current_player_x += 2
+		current_weapon_x = current_player_x + 2
 		current_weapon_y = current_player_y
 	current_weapon_x = check_position(current_weapon_x)
 	current_weapon_y = check_position(current_weapon_y)
