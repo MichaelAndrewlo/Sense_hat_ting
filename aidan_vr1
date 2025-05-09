@@ -65,9 +65,9 @@ def weapon(direction):
 	elif direction == 'down':
 		current_weapon_y = current_player_y + 2
 	elif direction == 'left':
-		current_weapon_x = current_player_x -= 2
+		current_weapon_x = current_player_x - 2
 	elif direction == 'right':
-		current_weapon_x = current_player_x += 2
+		current_weapon_x = current_player_x + 2
 	current_weapon_x = check_position(current_weapon_x)
 	current_weapon_y = check_position(current_weapon_y)
 
