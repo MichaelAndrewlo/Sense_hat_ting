@@ -9,7 +9,7 @@ black = (0, 0, 0)
 player_colours = [blue, green]
 
 class Player:
-	def _init_(self, x, t, wx, wy, colour):
+	def _init_(self, x, y, wx, wy, colour):
 		self.position = [x, y]
 		self.weapon = [wx, wy]
 		self.colour = colour
@@ -60,7 +60,7 @@ def is_dead(players):
 	if players[0].get_position == players[1].get_weapon():
 		dead = True
 		winner = '2'
-	elif players[1].get_position == players{0}.get_weapon():
+	elif players[1].get_position == players[0].get_weapon():
 		dead = True
 		winner = '1'
 
@@ -94,4 +94,4 @@ while not dead:
 	
 	player_turn = switch_player(player_turn)
 
-print(f'The winner is player {winner}'
+print(winner)
