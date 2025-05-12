@@ -97,7 +97,7 @@ while not dead:
 	if dead:
 		break
 
-	event = sense.stick.wait_for_event()
+	for event in sense.stick.get_events():
 	if event.action == 'pressed':
 		original_position = current_player.get_position()[:]
 		current_player.move(event.direction)
