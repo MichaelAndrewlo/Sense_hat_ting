@@ -89,23 +89,20 @@ dead = False
 winner = ''
 
 while not dead:
+	
 	current_player = players[player_turn]
 	other_player = players[1 - player_turn]
-
 	update_display(players)
 	is_dead(players)
 	if dead:
 		break
-
 	for event in sense.stick.get_events():
-	if event.action == 'pressed':
-		original_position = current_player.get_position()[:]
-		current_player.move(event.direction)
-
+		if event.action == 'pressed':
+			original_position = current_player.get_position()[:]
+			current_player.move(event.direction)
 		if current_player.get_position() == other_player.get_position():
 			current_player.position = original_position
 			continue
-
 		current_player.fire_weapon(event.direction)
 		update_display(players)
 		player_turn = switch_player(player_turn)
