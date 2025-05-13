@@ -96,6 +96,19 @@ while not dead:
 	is_dead(players)
 	if dead:
 		break
+	event = sense.stick.wait_for_event()
+	if event.action == 'pressed':
+		original_position = player_positions[player][:]
+		move(event.direction)
+		if player_positions[player] == player_positions[1 - player]:
+			player_positions[player] = original_position
+			continue
+		weapon(event.direction)
+		update_display(starting_px, starting_py, starting_wx, starting_wy)
+		player = switch_player(player)
+
+
+	
 	for event in sense.stick.get_events():
 		if event.action == 'pressed':
 			original_position = current_player.get_position()[:]
