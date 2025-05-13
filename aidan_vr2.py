@@ -88,11 +88,11 @@ player_turn = 0
 dead = False
 winner = ''
 
-while not dead:
-	
+sense.clear()
+update_display(players)
+while not dead:	
 	current_player = players[player_turn]
 	other_player = players[1 - player_turn]
-	update_display(players)
 	is_dead(players)
 	if dead:
 		break
@@ -104,7 +104,9 @@ while not dead:
 			current_player.position = original_position
 			continue
 		current_player.fire_weapon(event.direction)
+		sense.clear()
 		update_display(players)
 		player_turn = switch_player(player_turn)
+		break
 
 print(winner)
