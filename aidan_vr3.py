@@ -52,14 +52,14 @@ def is_dead(players):
     p1_hit = players[0].get_position() == players[1].get_weapon()
     p2_hit = players[1].get_position() == players[0].get_weapon()
     if p1_hit and p2_hit:
-        player1.score += 1
-        player2.score += 1
+        players[0].score += 1
+        players[1].score += 1
         return True, 'draw'
     elif p1_hit:
-        player2.score += 3
+        players[1].score += 3
         return True, '2'
     elif p2_hit:
-        player1.score += 3
+        players[0].score += 3
         return True, '1'
     return False, ''
 
@@ -110,7 +110,7 @@ def run_game():
                     current_player.fire_weapon(event.direction)
 
                 update_display(players)
-                dead, winner = is_dead(players, scores)
+                dead, winner = is_dead(players)
 
 
                 if not dead:
