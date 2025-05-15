@@ -80,7 +80,25 @@ class Player:
     
     def get_score(self):
         return self.score
+      
+class trap:
+  def __init__(self, x, y, z):
+    self.position = [x, y]
+    self.time = z
 
+  def aoe(self):
+    aoe = []
+    for i in range(-1, 1):
+      for x in range(-1, 1):
+        check_position(i)
+        check_position(x)
+        coords = [i, x]
+        aoe.append(coords)
+  
+  def killzone(self, aoe)
+  if self.time < 6:
+    self.time += 1  
+  else
 def check_position(position):
     return max(0, min(7, position))
 
