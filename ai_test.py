@@ -38,4 +38,5 @@ class Enemy:
 
 enemy1 = Enemy(6, 6)
 while True:
-  
+  enemy1.ai()
+  sleep(1)
