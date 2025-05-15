@@ -15,12 +15,12 @@ class Enemy:
     self.position = [x, y]
 
   def ai(self, player1, player2):
-    dist = get_dist(self.position[0], self.position[1], player1.position[0], player1.position[1])
-    dist2 = get_dist(self.position[0], self.position[1], player2.position[0], player2.position[1])
     pl_x = player1.position[0]
     pl_y = player1.position[1]
     pl2_x = player2.position[0]
     pl2_y = player2.position[1]
+    dist = get_dist(self.position[0], self.position[1], pl_x, pl_y)
+    dist2 = get_dist(self.position[0], self.position[1], pl2_x, pl2_y)
     if dist < dist2: 
       u_plx = pl_x 
       u_ply = pl_y 
