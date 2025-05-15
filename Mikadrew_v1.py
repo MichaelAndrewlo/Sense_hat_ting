@@ -14,7 +14,7 @@ class Enemy:
   def __init__(self, x, y):
     self.position = [x, y]
 
-  def ai(self):
+  def ai(self, player1, player2):
     dist = get_dist(self.position[0], self.position[1], player1.position[0], player1.position[1])
     dist2 = get_dist(self.position[0], self.position[1], player2.position[0], player2.position[1])
     pl_x = player1.position[0]
@@ -139,7 +139,7 @@ def run_game():
         while not dead:
             action += 1
             if action % 4 == 0:
-                enemy_1.ai()
+                enemy_1.ai(player1, player2)
             current_player = players[player_turn]
             other_player = players[1 - player_turn]
 
