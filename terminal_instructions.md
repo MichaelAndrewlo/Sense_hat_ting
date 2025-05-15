@@ -9,6 +9,6 @@ to pull ie get latest vr from cloud
 
 to commit and push to cloud
 
-4. git add [file name]
+4. git add/rm [file name]
 5. git commit -m "[commit message]"
 6. git push
