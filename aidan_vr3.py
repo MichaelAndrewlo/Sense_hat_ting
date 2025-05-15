@@ -1,9 +1,10 @@
 from sense_hat import SenseHat
 
 class Player:
-    def __init__(self, x, y, wx, wy, colour):
+    def __init__(self, x, y, wx, wy, s, colour):
         self.position = [x, y]
         self.weapon = [wx, wy]
+        self.score = s
         self.colour = colour
 
     def move(self, direction):
@@ -40,22 +41,25 @@ class Player:
 
     def get_weapon(self):
         return self.weapon
+    
+    def get_score(self):
+        return self.score
 
 def check_position(position):
     return max(0, min(7, position))
 
-def is_dead(players, scores):
+def is_dead(players):
     p1_hit = players[0].get_position() == players[1].get_weapon()
     p2_hit = players[1].get_position() == players[0].get_weapon()
     if p1_hit and p2_hit:
-        scores[0] += 1
-        scores[1] += 1
+        player1.score += 1
+        player2.score += 1
         return True, 'draw'
     elif p1_hit:
-        scores[1] += 3
+        player2.score += 3
         return True, '2'
     elif p2_hit:
-        scores[0] += 3
+        player1.score += 3
         return True, '1'
     return False, ''
 
@@ -76,11 +80,15 @@ def run_game():
         sense.set_pixel(players[1].get_position()[0], players[1].get_position()[1], players[1].colour)
         sense.set_pixel(players[0].get_weapon()[0], players[0].get_weapon()[1], red)
         sense.set_pixel(players[1].get_weapon()[0], players[1].get_weapon()[1], red)
-
+    
+    player1 = Player(0, 0, 0, 2, 0, blue)
+    player2 = Player(7, 7, 7, 5, 0, green)
+    players = [player1, player2]
     while True:
-        player1 = Player(0, 0, 0, 2, blue)
-        player2 = Player(7, 7, 7, 5, green)
-        players = [player1, player2]
+        player1.position = [0, 0]
+        player1.weapon = [0, 2]
+        player2.position = [7, 7]
+        player2.position = [7, 5]
         player_turn = 0
         winner = ''
         dead = False
@@ -110,15 +118,15 @@ def run_game():
 
         print("\n--- Round Over ---")
         print("Winner: " + str(winner))
-        print("Score - Player 1: " + str(scores[0]) + " | Player 2: " + str(scores[1]))
+        print("Score - Player 1: " + str(player1.get_score()) + " | Player 2: " + str(player2.get_score()))
 
         choice = input("Press Enter to play again or type 'exit' to quit: ").strip().lower()
         if choice == 'exit':
             break
 
     print("\nFinal Scores:")
-    print("Player 1: " + str(scores[0]))
-    print("Player 2: " + str(scores[1]))
+    print("Player 1: " + str(player1.get_score()))
+    print("Player 2: " + str(player2.get_score()))
     print("Thanks for playing!")
 
 if __name__ == "__main__":
