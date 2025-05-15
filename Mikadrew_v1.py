@@ -83,7 +83,25 @@ class Player:
 
 def check_position(position):
     return max(0, min(7, position))
+  
+class trap:
+  def __init__(self, x, y, z):
+    self.position = [x, y]
+    self.time = z
 
+  def aoe(self):
+    aoe = []
+    for i in range(-1, 1):
+      for x in range(-1, 1):
+        check_position(i)
+        check_position(x)
+        coords = [i, x]
+        aoe.append(coords)
+  
+  def killzone(self, aoe)
+  if self.time < 6:
+    self.time += 1  
+  else
 def is_dead(players):
     p1_hit = players[0].get_position() == players[1].get_weapon()
     p2_hit = players[1].get_position() == players[0].get_weapon()
