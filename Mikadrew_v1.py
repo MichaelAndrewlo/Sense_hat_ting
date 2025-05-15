@@ -27,11 +27,11 @@ class Enemy:
     else:
       u_plx = pl2_x 
       u_ply = pl2_y 
-    if self.position[0], < u_plx:  
-      self.position[0], += 1  
-    elif self.position[0], > u_plx:  
-      self.position[0], -= 1  
-    elif self.position[1], < u_ply:  
+    if self.position[0] < u_plx:  
+      self.position[0] += 1  
+    elif self.position[0] > u_plx:  
+      self.position[0] -= 1  
+    elif self.position[1] < u_ply:  
       self.position[1] += 1  
     else:  
       self.position[1] -= 1  
@@ -129,6 +129,7 @@ def run_game():
         player2.position = [7, 7]
         player2.weapon = [7, 5]
         player_turn = 0
+        action = 0
         winner = ''
         dead = False
 
@@ -136,7 +137,9 @@ def run_game():
         update_display(players)
 
         while not dead:
-            enemy_1.ai()
+            action += 1
+            if action % 4 == 0:
+                enemy_1.ai()
             current_player = players[player_turn]
             other_player = players[1 - player_turn]
 
