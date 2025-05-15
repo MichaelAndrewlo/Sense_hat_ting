@@ -4,6 +4,7 @@ git clone https://github.com/MichaelAndrewlo/Sense_hat_ting.git
 2. git status
 
 to pull ie get latest vr from cloud
+
 3. git pull
 
 to commit and push to cloud
