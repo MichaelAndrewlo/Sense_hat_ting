@@ -11,4 +11,4 @@ to commit and push to cloud
 
 4. git add [file name]
 5. git commit -m "[commit message]"
-6. 
+6. git push
