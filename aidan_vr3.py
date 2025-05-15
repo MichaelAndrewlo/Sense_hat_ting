@@ -88,7 +88,7 @@ def run_game():
         player1.position = [0, 0]
         player1.weapon = [0, 2]
         player2.position = [7, 7]
-        player2.position = [7, 5]
+        player2.weapon = [7, 5]
         player_turn = 0
         winner = ''
         dead = False
