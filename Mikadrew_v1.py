@@ -1,4 +1,40 @@
 from sense_hat import SenseHat
+from time import sleep
+
+def get_dist(x, y, x2, y2): 
+  x_dist = x - x2 
+  y_dist = y - y2 
+  x_square = x_dist ** 2 
+  y_square = y_dist ** 2 
+  square = x_square + y_square 
+  dist = square ** (1 / 2) 
+  return dist 
+
+class Enemy:
+  def __init__(self, x, y):
+    self.position = [x, y]
+
+  def ai(self):
+    dist = get_dist(self.position[0], self.position[1], player1.position[0], player1.position[1])
+    dist2 = get_dist(self.position[0], self.position[1], player2.position[0], player2.position[1])
+    pl_x = player1.position[0]
+    pl_y = player1.position[1]
+    pl2_x = player2.position[0]
+    pl2_y = player2.position[1]
+    if dist < dist2: 
+      u_plx = pl_x 
+      u_ply = pl_y 
+    else:
+      u_plx = pl2_x 
+      u_ply = pl2_y 
+    if self.position[0], < u_plx:  
+      self.position[0], += 1  
+    elif self.position[0], > u_plx:  
+      self.position[0], -= 1  
+    elif self.position[1], < u_ply:  
+      self.position[1] += 1  
+    else:  
+      self.position[1] -= 1  
 
 class Player:
     def __init__(self, x, y, wx, wy, s, colour):
@@ -84,6 +120,9 @@ def run_game():
     player1 = Player(0, 0, 0, 2, 0, blue)
     player2 = Player(7, 7, 7, 5, 0, green)
     players = [player1, player2]
+    action = 0
+    enemy1 = Enemy(6, 6)
+    
     while True:
         player1.position = [0, 0]
         player1.weapon = [0, 2]
@@ -97,6 +136,7 @@ def run_game():
         update_display(players)
 
         while not dead:
+            enemy_1.ai()
             current_player = players[player_turn]
             other_player = players[1 - player_turn]
 
