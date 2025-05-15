@@ -45,6 +45,49 @@ class Player:
     def get_score(self):
         return self.score
 
+class Enemy(Player):
+    def __init__(self, x, y):
+        self.position = [x, y]
+
+    def get_closest_player(self, players):
+        player1_distance = ((self.get_position()[0] - players[0].get_position()[0]) ** 2 + (self.get_position()[1] - players[0].get_position()[1]) ** 2) ** 1/2
+        player2_distance = ((self.get_position()[0] - players[1].get_position()[0]) ** 2 + (self.get_position()[1] - players[1].get_position()[1]) ** 2) ** 1/2
+        closest = min(player1_distance, player2_distance)
+        if player1_distance == closest and player2_distance == closest:
+            return 0
+        elif player1_distance == closest:
+            return 0
+        elif player2_distance == closest:
+            return 1
+        
+def ai_turn(players, enemies):
+    e1c = players[enemies[0].get_closest_player(players)].get_position()
+    e2c = players[enemies[1].get_closest_player(players)].get_position()
+    
+    
+def ai(self, player1, player2):
+    pl_x = player1.position[0]
+    pl_y = player1.position[1]
+    pl2_x = player2.position[0]
+    pl2_y = player2.position[1]
+    dist = get_dist(self.position[0], self.position[1], pl_x, pl_y)
+    dist2 = get_dist(self.position[0], self.position[1], pl2_x, pl2_y)
+    if dist < dist2: 
+      u_plx = pl_x 
+      u_ply = pl_y 
+    else:
+      u_plx = pl2_x 
+      u_ply = pl2_y 
+    if self.position[0] < u_plx:  
+      self.position[0] += 1  
+    elif self.position[0] > u_plx:  
+      self.position[0] -= 1  
+    elif self.position[1] < u_ply:  
+      self.position[1] += 1  
+    else:  
+      self.position[1] -= 1  
+    
+
 def check_position(position):
     return max(0, min(7, position))
 
@@ -84,11 +127,20 @@ def run_game():
     player1 = Player(0, 0, 0, 2, 0, blue)
     player2 = Player(7, 7, 7, 5, 0, green)
     players = [player1, player2]
+    
+    enemy1 = Enemy(0, 7)
+    enemy2 = Enemy(7, 0)
+    enemies = [enemy1, enemy2]
+    
     while True:
         player1.position = [0, 0]
         player1.weapon = [0, 2]
         player2.position = [7, 7]
         player2.weapon = [7, 5]
+        
+        enemy1.position = [0, 7]
+        enemy2.position = [7, 0]
+        
         player_turn = 0
         winner = ''
         dead = False
@@ -108,11 +160,12 @@ def run_game():
                 if current_player.get_position() == other_player.get_position():
                     current_player.position = original_position
                     current_player.fire_weapon(event.direction)
+                
+                enemies[0].turn()
+                enemies[1].turn()
 
                 update_display(players)
                 dead, winner = is_dead(players)
-
-
                 if not dead:
                     player_turn = switch_player(player_turn)
 
