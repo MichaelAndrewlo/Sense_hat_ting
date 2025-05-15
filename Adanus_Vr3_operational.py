@@ -72,7 +72,6 @@ def run_game():
     red = (255, 0, 0)
     green = (0, 255, 0)
     blue = (0, 0, 255)
-    scores = [0, 0]
 
     def update_display(players):
         sense.clear()
