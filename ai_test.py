@@ -36,5 +36,6 @@ class Enemy:
     else:  
       self.position[1] -= 1  
 
+enemy1 = Enemy(6, 6)
 while True:
   
