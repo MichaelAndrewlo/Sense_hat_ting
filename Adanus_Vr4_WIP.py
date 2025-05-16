@@ -36,22 +36,13 @@ class Player:
         self.weapon[0] = check_position(self.weapon[0])
         self.weapon[1] = check_position(self.weapon[1])
 
-    def get_position(self):
-        return self.position
-
-    def get_weapon(self):
-        return self.weapon
-    
-    def get_score(self):
-        return self.score
-
 class Enemy(Player):
     def __init__(self, x, y):
         self.position = [x, y]
 
     def get_closest_player(self, players):
-        player1_distance = ((self.get_position()[0] - players[0].get_position()[0]) ** 2 + (self.get_position()[1] - players[0].get_position()[1]) ** 2) ** 1/2
-        player2_distance = ((self.get_position()[0] - players[1].get_position()[0]) ** 2 + (self.get_position()[1] - players[1].get_position()[1]) ** 2) ** 1/2
+        player1_distance = ((self.position[0] - players[0].position[0]) ** 2 + (self.position[1] - players[0].position[1]) ** 2) ** 1/2
+        player2_distance = ((self.position[0] - players[1].position[0]) ** 2 + (self.position[1] - players[1].position[1]) ** 2) ** 1/2
         closest = min(player1_distance, player2_distance)
         if player1_distance == closest and player2_distance == closest:
             return 0
@@ -80,22 +71,22 @@ def check_position(position):
     return max(0, min(7, position))
 
 def is_dead(players, enemies):
-    p1_hit_by_weapon = players[0].get_position() == players[1].get_weapon()
-    p2_hit_by_weapon = players[1].get_position() == players[0].get_weapon()
+    p1_hit_by_weapon = players[0].position == players[1].weapon
+    p2_hit_by_weapon = players[1].position == players[0].weapon
 
     p1_hit_by_enemy = False
     p2_hit_by_enemy = False
 
     for enemy in enemies:
-        if enemy.get_position() == players[0].get_position():
+        if enemy.position == players[0].position:
             p1_hit_by_enemy = True
-        if enemy.get_position() == players[1].get_position():
+        if enemy.position == players[1].position:
             p2_hit_by_enemy = True
 
     enemies_to_remove = []
     for enemy in enemies:
         for player in players:
-            if enemy.get_position() == player.get_weapon():
+            if enemy.position == player.weapon:
                 enemies_to_remove.append(enemy)
 
     for enemy in enemies_to_remove:
@@ -141,13 +132,13 @@ def run_game():
 
     def update_display(players, enemies):
         sense.clear()
-        sense.set_pixel(players[0].get_position()[0], players[0].get_position()[1], players[0].colour)
-        sense.set_pixel(players[1].get_position()[0], players[1].get_position()[1], players[1].colour)
-        sense.set_pixel(players[0].get_weapon()[0], players[0].get_weapon()[1], red)
-        sense.set_pixel(players[1].get_weapon()[0], players[1].get_weapon()[1], red)
+        sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
+        sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)
+        sense.set_pixel(players[0].weapon[0], players[0].weapon[1], red)
+        sense.set_pixel(players[1].weapon[0], players[1].weapon[1], red)
         
         for enemy in enemies:
-            sense.set_pixel(enemy.get_position()[0], enemy.get_position()[1], yellow)
+            sense.set_pixel(enemy.position[0], enemy.position[1], yellow)
 
     
     player1 = Player(0, 0, 0, 2, 0, blue)
@@ -180,11 +171,11 @@ def run_game():
 
             event = sense.stick.wait_for_event()
             if event.action == 'pressed':
-                original_position = current_player.get_position()[:]
+                original_position = current_player.position
                 current_player.move(event.direction)
                 ai_turn(players, enemies)
 
-                if current_player.get_position() == other_player.get_position():
+                if current_player.position == other_player.position:
                     current_player.position = original_position
                     current_player.fire_weapon(event.direction)
                 else:
@@ -195,15 +186,15 @@ def run_game():
 
         print("\n--- Round Over ---")
         print("Winner: " + str(winner))
-        print("Score - Player 1: " + str(player1.get_score()) + " | Player 2: " + str(player2.get_score()))
+        print("Score - Player 1: " + str(player1.score) + " | Player 2: " + str(player2.score))
 
         choice = input("Press Enter to play again or type 'exit' to quit: ").strip().lower()
         if choice == 'exit':
             break
 
     print("\nFinal Scores:")
-    print("Player 1: " + str(player1.get_score()))
-    print("Player 2: " + str(player2.get_score()))
+    print("Player 1: " + str(player1.score))
+    print("Player 2: " + str(player2.score))
     print("Thanks for playing!")
 
 if __name__ == "__main__":
