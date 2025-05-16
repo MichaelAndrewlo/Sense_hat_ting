@@ -38,16 +38,16 @@ class Enemy:
       else:  
         enemy.position[1] -= 1  
 
-  def spawn_enemy(self, enemies, difficulty)
-    if len(enemies) > 0:
-      pass
-    else:
-      for i in range(difficulty):
-        x = randint(0,7)
-        y = randint(0,7)
-        name = "enemy" + str(i)
-        name = Enemy(x, y)
-        enemies.append(name)
+ def spawn_enemy( enemies, difficulty)
+   if len(enemies) > 0:
+     pass
+   else:
+     for i in range(difficulty):
+       x = randint(0,7)
+       y = randint(0,7)
+       name = "enemy" + str(i)
+       name = Enemy(x, y)
+       enemies.append(name)
 
 class Player:
     def __init__(self, x, y, wx, wy, s, colour):
