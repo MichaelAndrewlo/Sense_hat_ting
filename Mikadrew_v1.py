@@ -97,11 +97,26 @@ class trap:
         check_position(x)
         coords = [i, x]
         aoe.append(coords)
+    return aoe
   
-  def killzone(self, aoe)
-  if self.time < 6:
-    self.time += 1  
-  else
+  def killzone(self, aoe, players):
+    if self.time < 6:
+      self.time += 1  
+    else:
+      for i in aoe:
+        if players[0].get_position() == i and players[1].get_position() == i:
+          players[0].score += 1
+          players[1].score += 1
+          return True, 'draw'
+        elif players[0].get_position() == i:
+          players[1].score += 3
+          return True, '2'
+        elif players[1].get_position() == i:
+          players[0].score += 3
+          return True, '1'
+        else:
+          return False, ''
+
 def is_dead(players):
     p1_hit = players[0].get_position() == players[1].get_weapon()
     p2_hit = players[1].get_position() == players[0].get_weapon()
