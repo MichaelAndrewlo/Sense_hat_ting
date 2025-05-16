@@ -50,7 +50,23 @@ class Enemy(Player):
             return 0
         elif player2_distance == closest:
             return 1
-        
+class Trap:
+    def __init__(self, x, y):
+        self.position = [x, y]
+        self.turns = 3
+        self.active = False
+    def 
+
+def spawn_trap(players, player_turn, traps):   
+    if player_turn == 0:
+        trap1 = Trap(players[player_turn].get_position()[0], players[player_turn].get_position()[1])
+        traps[0] = trap1
+    elif player_turn == 1:
+        trap2 = Trap(players[player_turn].get_position()[0], players[player_turn].get_position()[1])
+        traps[1] = trap2 
+
+
+    
 def ai_turn(players, enemies):
     for enemy in enemies:
         closest_index = enemy.get_closest_player(players)
