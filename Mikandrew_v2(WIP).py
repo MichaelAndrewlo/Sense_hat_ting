@@ -38,7 +38,7 @@ class Enemy:
       else:  
         enemy.position[1] -= 1  
 
- def spawn_enemy( enemies, difficulty)
+ def spawn_enemy(enemies, difficulty)
    if len(enemies) > 0:
      pass
    else:
@@ -48,6 +48,10 @@ class Enemy:
        name = "enemy" + str(i)
        name = Enemy(x, y)
        enemies.append(name)
+
+def enemy_kill(enemies, players):
+  for t in range(len(enemies)):
+    if enemies[t].position == players[0] or enemies[t].position == players[1].position
 
 class Player:
     def __init__(self, x, y, wx, wy, s, colour):
@@ -97,27 +101,27 @@ class Player:
 def check_position(position):
     return max(0, min(7, position))
   
-class trap:
+class Trap:
   def __init__(self, x, y, z):
     self.position = [x, y]
     self.time = z
-
-  def aoe(self):
     aoe = []
-    for i in range(-1, 1):
-      for x in range(-1, 1):
-        check_position(i)
-        check_position(x)
-        coords = [i, x]
+    for i in range(-1, 2):
+      for x in range(-1, 2):
+        x_pos = self.position[0] + i
+        y_pos = self.position[1] + x
+        x_pos = check_position(x_pos)
+        y_pos = check_position(y_pos)
+        coords = [x_pos, y_pos]
         aoe.append(coords)
-    return aoe
+    self.aoe = aoe
   
-  def killzone(self, aoe, players):
+  def trap_kill(self, players):
     if self.time < 6:
       self.time += 1  
     else:
-      for i in aoe:
-        if players[0].get_position() == i and players[1].get_position() == i:
+      for i in self.aoe:
+        if players[0].position() == i and players[1].position() == i:
           players[0].score += 1
           players[1].score += 1
           return True, 'draw'
@@ -129,6 +133,14 @@ class trap:
           return True, '1'
         else:
           return False, ''
+
+def spawn_trap(player, traps, traps_aoe):
+  x = player.position[0]
+  y = player.position[1]
+  trap = Trap[x, y, 0]
+  traps.append(trap)
+  return traps
+
 
 def is_dead(players, enemies):
   for enemy in enemies:
@@ -163,6 +175,9 @@ def run_game():
         sense.set_pixel(players[1].get_position()[0], players[1].get_position()[1], players[1].colour)
         sense.set_pixel(players[0].get_weapon()[0], players[0].get_weapon()[1], red)
         sense.set_pixel(players[1].get_weapon()[0], players[1].get_weapon()[1], red)
+        for aoe in trap1.aoe:
+          sense.set_pixel(aoe[0], aoe[1], (255, 255, 255))
+        sense.set_pixel(traps[0].position[0], traps[0].position[1], (255, 0, 0))
     
     player1 = Player(0, 0, 0, 2, 0, blue)
     player2 = Player(7, 7, 7, 5, 0, green)
@@ -171,6 +186,8 @@ def run_game():
     enemy1 = Enemy(0, 7)
     enemy2 = Enemy(7, 0)
     enemies = [enemy1, enemy2]
+    traps = []
+    traps_aoe = []
     while True:
         player1.position = [0, 0]
         player1.weapon = [0, 2]
