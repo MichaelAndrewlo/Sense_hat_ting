@@ -89,15 +89,6 @@ class Player:
         self.weapon[0] = check_position(self.weapon[0])
         self.weapon[1] = check_position(self.weapon[1])
 
-    def get_position(self):
-        return self.position
-
-    def get_weapon(self):
-        return self.weapon
-    
-    def get_score(self):
-        return self.score
-
 def check_position(position):
     return max(0, min(7, position))
   
@@ -121,14 +112,14 @@ class Trap:
       self.time += 1  
     else:
       for i in self.aoe:
-        if players[0].position() == i and players[1].position() == i:
+        if players[0].position == i and players[1].position == i:
           players[0].score += 1
           players[1].score += 1
           return True, 'draw'
-        elif players[0].get_position() == i:
+        elif players[0].position == i:
           players[1].score += 3
           return True, '2'
-        elif players[1].get_position() == i:
+        elif players[1].position == i:
           players[0].score += 3
           return True, '1'
         else:
@@ -144,8 +135,8 @@ def spawn_trap(player, traps, traps_aoe):
 
 def is_dead(players, enemies):
   for enemy in enemies:
-    p1_hit = players[0].get_position() == players[1].get_weapon() or players[0].get_position() == enemies[enemy].position()
-    p2_hit = players[1].get_position() == players[0].get_weapon() or players[1].get_position() == enemies[enemy].position()
+    p1_hit = players[0].position == players[1].weapon or players[0].position == enemies[enemy].position()
+    p2_hit = players[1].position == players[0].weapon or players[1].position == enemies[enemy].position()
     if p1_hit and p2_hit:
         players[0].score += 1
         players[1].score += 1
@@ -171,10 +162,10 @@ def run_game():
 
     def update_display(players):
         sense.clear()
-        sense.set_pixel(players[0].get_position()[0], players[0].get_position()[1], players[0].colour)
-        sense.set_pixel(players[1].get_position()[0], players[1].get_position()[1], players[1].colour)
-        sense.set_pixel(players[0].get_weapon()[0], players[0].get_weapon()[1], red)
-        sense.set_pixel(players[1].get_weapon()[0], players[1].get_weapon()[1], red)
+        sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
+        sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)
+        sense.set_pixel(players[0].weapon[0], players[0].weapon[1], red)
+        sense.set_pixel(players[1].weapon[0], players[1].weapon[1], red)
         for aoe in trap1.aoe:
           sense.set_pixel(aoe[0], aoe[1], (255, 255, 255))
         sense.set_pixel(traps[0].position[0], traps[0].position[1], (255, 0, 0))
@@ -210,10 +201,10 @@ def run_game():
 
             event = sense.stick.wait_for_event()
             if event.action == 'pressed':
-                original_position = current_player.get_position()[:]
+                original_position = current_player.position[:]
                 current_player.move(event.direction)
 
-                if current_player.get_position() == other_player.get_position():
+                if current_player.position == other_player.position:
                     current_player.position = original_position
                     current_player.fire_weapon(event.direction)
 
@@ -226,15 +217,15 @@ def run_game():
 
         print("\n--- Round Over ---")
         print("Winner: " + str(winner))
-        print("Score - Player 1: " + str(player1.get_score()) + " | Player 2: " + str(player2.get_score()))
+        print("Score - Player 1: " + str(player1.score) + " | Player 2: " + str(player2.score))
 
         choice = input("Press Enter to play again or type 'exit' to quit: ").strip().lower()
         if choice == 'exit':
             break
 
     print("\nFinal Scores:")
-    print("Player 1: " + str(player1.get_score()))
-    print("Player 2: " + str(player2.get_score()))
+    print("Player 1: " + str(player1.score()))
+    print("Player 2: " + str(player2.score()))
     print("Thanks for playing!")
 
 if __name__ == "__main__":
