@@ -116,25 +116,24 @@ class Trap:
     self.aoe = aoe
   
   def trap_kill(self, players):
-    if self.time < 3:
+    if self.time < 6:
       self.time += 1  
       self.col = (125, 125, 125)
       return False, ''
     else:
       self.col = (255, 255, 255)
-      for aoe in self.aoe:
-        if players[0].position == aoe and players[1].position == aoe:
-          players[0].score += 1
-          players[1].score += 1
-          return True, 'draw'
-        elif players[0].position == aoe:
-          players[1].score += 3
-          return True, '2'
-        elif players[1].position == aoe:
-          players[0].score += 3
-          return True, '1'
-        else:
-          return False, ''
+      if players[0].position in self.aoe and players[1].position in self.aoe:
+        players[0].score += 1
+        players[1].score += 1
+        return True, 'draw'
+      elif players[0].position in self.aoe:
+        players[1].score += 3
+        return True, '2'
+      elif players[1].position in self.aoe:
+        players[0].score += 3
+        return True, '1'
+      else:
+        return False, ''
 
 def spawn_trap(player, traps):
   x = player.position[0]
@@ -231,16 +230,16 @@ def run_game():
 
                 if current_player.position == other_player.position:
                     current_player.position = original_position
-                    current_player.fire_weapon(event.direction)
-
+                    current_player.fire_weapon(event.direction, traps)
+                    
                 update_display(players, enemies)
                 dead, winner = is_dead(players, enemies)
                 if len(traps) != 0:
                   for trap in traps:
                     dead, winner = trap.trap_kill(players)
-
+                    
                 if not dead:
-                    player_turn = switch_player(player_turn)
+                  player_turn = switch_player(player_turn)
 
         print("\n--- Round Over ---")
         print("Winner: " + str(winner))
@@ -256,4 +255,5 @@ def run_game():
     print("Thanks for playing!")
 
 if __name__ == "__main__":
+    run_game()
     run_game()
