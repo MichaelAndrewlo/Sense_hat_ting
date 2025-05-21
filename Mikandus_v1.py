@@ -84,7 +84,13 @@ class Trap:
         return True, '1'
       else:
         return False, ''
-          
+
+def spawn_trap(player, traps):
+  x = player.position[0]
+  y = player.position[1]
+  trap = Trap(x, y, 0)
+  traps.append(trap)
+  return traps
 
 def spawn_enemy(enemies, difficulty):
    if len(enemies) > 0:
