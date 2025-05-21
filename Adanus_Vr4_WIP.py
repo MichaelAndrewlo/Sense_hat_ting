@@ -54,8 +54,13 @@ class Trap:
     def __init__(self, x, y):
         self.position = [x, y]
         self.turns = 3
-        self.active = False
-    def 
+        self.colour = (125, 125, 125)
+        self.aoe = self.set_aoe(x, y)
+    def set_aoe(self, x, y):
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                x_pos = self.position[0] + x
+                y_pos = self.position[1] + y
 
 def spawn_trap(players, player_turn, traps):   
     if player_turn == 0:
