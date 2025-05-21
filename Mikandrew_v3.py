@@ -100,10 +100,10 @@ def check_position(position):
     return max(0, min(7, position))
   
 class Trap:
-  def __init__(self, x, y, z, col):
+  def __init__(self, x, y, z):
     self.position = [x, y]
     self.time = z
-    self.col = col
+    self.col = (0, 50, 50)
     aoe = []
     for i in range(-1, 2):
       for x in range(-1, 2):
@@ -118,7 +118,6 @@ class Trap:
   def trap_kill(self, players):
     if self.time < 6:
       self.time += 1  
-      self.col = (125, 125, 125)
       return False, ''
     else:
       self.col = (255, 255, 255)
@@ -138,10 +137,9 @@ class Trap:
 def spawn_trap(player, traps):
   x = player.position[0]
   y = player.position[1]
-  trap = Trap(x, y, 0, (0, 0, 0))
+  trap = Trap(x, y, 0)
   traps.append(trap)
   return traps
-
 
 def is_dead(players, enemies):
   p1_dead = False
@@ -186,7 +184,7 @@ def run_game():
           for trap in traps:
             for aoe in trap.aoe:
               sense.set_pixel(aoe[0], aoe[1], trap.col)
-            sense.set_pixel(traps[0].position[0], traps[0].position[1], (255, 0, 0))
+            sense.set_pixel(trap.position[0], trap.position[1], (255, 0, 0))
         sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
         sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)
         sense.set_pixel(players[0].weapon[0], players[0].weapon[1], red)
@@ -230,7 +228,7 @@ def run_game():
 
                 if current_player.position == other_player.position:
                     current_player.position = original_position
-                    current_player.fire_weapon(event.direction, traps, enemies)
+                    current_player.fire_weapon(event.direction, traps)
                     
                 dead, winner = is_dead(players, enemies)
                 if len(traps) != 0:
