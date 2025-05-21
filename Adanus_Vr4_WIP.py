@@ -53,22 +53,22 @@ class Enemy(Player):
 class Trap:
     def __init__(self, x, y):
         self.position = [x, y]
-        self.turns = 3
+        self.turn = 3
         self.colour = (125, 125, 125)
-        self.aoe = self.set_aoe(x, y)
-    def set_aoe(self, x, y):
+        aoe = []
         for x in range(-1, 2):
             for y in range(-1, 2):
                 x_pos = self.position[0] + x
                 y_pos = self.position[1] + y
+                x_pos = check_position(x_pos)
+                y_pos = check_position(y_pos)
+                coords = [x_pos, y_pos]
+                aoe.append(coords)
+        self.aoe = aoe
 
-def spawn_trap(players, player_turn, traps):   
-    if player_turn == 0:
-        trap1 = Trap(players[player_turn].get_position()[0], players[player_turn].get_position()[1])
-        traps[0] = trap1
-    elif player_turn == 1:
-        trap2 = Trap(players[player_turn].get_position()[0], players[player_turn].get_position()[1])
-        traps[1] = trap2 
+def spawn_trap(x_pos, y_pos, traps):   
+    trap = Trap(x_pos, y_pos)
+    traps.append(trap)
 
 
     
@@ -91,25 +91,47 @@ def ai_turn(players, enemies):
 def check_position(position):
     return max(0, min(7, position))
 
-def is_dead(players, enemies):
+def is_dead(players, enemies, traps):
     p1_hit_by_weapon = players[0].position == players[1].weapon
     p2_hit_by_weapon = players[1].position == players[0].weapon
 
     p1_hit_by_enemy = False
     p2_hit_by_enemy = False
 
-    for enemy in enemies:
-        if enemy.position == players[0].position:
-            p1_hit_by_enemy = True
-        if enemy.position == players[1].position:
-            p2_hit_by_enemy = True
-
     enemies_to_remove = []
-    for enemy in enemies:
-        for player in players:
-            if enemy.position == player.weapon:
-                enemies_to_remove.append(enemy)
 
+    if len(enemies) > 0:
+
+        for enemy in enemies:
+            if enemy.position == players[0].position:
+                p1_hit_by_enemy = True
+            if enemy.position == players[1].position:
+                p2_hit_by_enemy = True
+
+        for enemy in enemies:
+            for player in players:
+                if enemy.position == player.weapon:
+                    enemies_to_remove.append(enemy)
+    
+    p1_in_trap = False
+    p2_in_trap = False
+
+    if len(traps) > 0:
+        for trap in traps:
+            if trap.turn <= 0:
+                trap.colour = (255, 255, 255)
+                for pos in trap.aoe:
+                    for enemy in enemies:
+                        if pos == enemy.position:
+                            enemies_to_remove.append(enemy)
+                    p1_in_trap = pos == players[0].position
+                    p2_in_trap = pos == players[1].position
+                    if p1_in_trap or p2_in_trap:
+                        traps.remove(trap)
+                        break
+            else:
+                trap.turn -= 1
+    
     for enemy in enemies_to_remove:
         enemies.remove(enemy)
 
@@ -117,11 +139,10 @@ def is_dead(players, enemies):
         players[0].score += 1
         players[1].score += 1
         return True, 'draw'
-
-    if p1_hit_by_enemy:
+    elif p1_hit_by_enemy:
         players[1].score += 3
         return True, '2'
-    if p2_hit_by_enemy:
+    elif p2_hit_by_enemy:
         players[0].score += 3
         return True, '1'
 
@@ -133,6 +154,17 @@ def is_dead(players, enemies):
         players[1].score += 3
         return True, '2'
     elif p2_hit_by_weapon:
+        players[0].score += 3
+        return True, '1'
+    
+    if p1_in_trap and p2_in_trap:
+        players[0].score += 1
+        players[1].score += 1
+        return True, 'draw'
+    elif p1_in_trap:
+        players[1].score += 3
+        return True, '2'
+    elif p2_in_trap:
         players[0].score += 3
         return True, '1'
 
@@ -151,7 +183,7 @@ def run_game():
     blue = (0, 0, 255)
     yellow = (255, 255, 0)
 
-    def update_display(players, enemies):
+    def update_display(players, enemies, traps):
         sense.clear()
         sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
         sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)
@@ -160,6 +192,10 @@ def run_game():
         
         for enemy in enemies:
             sense.set_pixel(enemy.position[0], enemy.position[1], yellow)
+
+        for trap in traps:
+            for pos in trap.aoe:
+                sense.set_pixel(pos[0], pos[1], trap.colour)
 
     
     player1 = Player(0, 0, 0, 2, 0, blue)
@@ -179,12 +215,14 @@ def run_game():
         enemy1 = Enemy(0, 7)
         enemy2 = Enemy(7, 0)
         enemies = [enemy1, enemy2]
+
+        traps = []
         
         player_turn = 0
         winner = ''
         dead = False
 
-        update_display(players, enemies)
+        update_display(players, enemies, traps)
 
         while not dead:
             current_player = players[player_turn]
@@ -192,18 +230,21 @@ def run_game():
 
             event = sense.stick.wait_for_event()
             if event.action == 'pressed':
-                original_position = current_player.position
-                current_player.move(event.direction)
-                ai_turn(players, enemies)
-
-                if current_player.position == other_player.position:
-                    current_player.position = original_position
-                    current_player.fire_weapon(event.direction)
+                if event.direction == 'middle':
+                    spawn_trap(current_player.position[0], current_player.position[1], traps)
                 else:
-                    update_display(players, enemies)
-                    dead, winner = is_dead(players, enemies)
-                    if not dead:
-                        player_turn = switch_player(player_turn)
+                    original_position = current_player.position
+                    current_player.move(event.direction)
+                    ai_turn(players, enemies)
+
+                    if current_player.position == other_player.position:
+                        current_player.position = original_position
+                        current_player.fire_weapon(event.direction)
+                    else:
+                        update_display(players, enemies, traps)
+                        dead, winner = is_dead(players, enemies, traps)
+                        if not dead:
+                            player_turn = switch_player(player_turn)
 
         print("\n--- Round Over ---")
         print("Winner: " + str(winner))
