@@ -85,7 +85,16 @@ class Trap:
       else:
         return False, ''
 
-
+  def spawn_enemy(enemies, difficulty):
+   if len(enemies) > 0:
+     pass
+   else:
+     for i in range(difficulty):
+       x = randint(0,7)
+       y = randint(0,7)
+       name = "enemy" + str(i)
+       name = Enemy(x, y)
+       enemies.append(name)
     
 def ai_turn(players, enemies):
     for enemy in enemies:
