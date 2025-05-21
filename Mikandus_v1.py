@@ -84,8 +84,9 @@ class Trap:
         return True, '1'
       else:
         return False, ''
+          
 
-  def spawn_enemy(enemies, difficulty):
+def spawn_enemy(enemies, difficulty):
    if len(enemies) > 0:
      pass
    else:
