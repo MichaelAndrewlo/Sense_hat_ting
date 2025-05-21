@@ -36,52 +36,50 @@ class Player:
         self.weapon[0] = check_position(self.weapon[0])
         self.weapon[1] = check_position(self.weapon[1])
 
-class Enemy(Player):
+class Enemy:
     def __init__(self, x, y):
         self.position = [x, y]
 
     def get_closest_player(self, players):
-        player1_distance = ((self.position[0] - players[0].position[0]) ** 2 + (self.position[1] - players[0].position[1]) ** 2) ** 1/2
-        player2_distance = ((self.position[0] - players[1].position[0]) ** 2 + (self.position[1] - players[1].position[1]) ** 2) ** 1/2
-        closest = min(player1_distance, player2_distance)
-        if player1_distance == closest and player2_distance == closest:
+        def distance(p):
+            dx = self.position[0] - p.position[0]
+            dy = self.position[1] - p.position[1]
+            return (dx**2 + dy**2) ** 0.5
+
+        d1 = distance(players[0])
+        d2 = distance(players[1])
+        if d1 <= d2:
             return 0
-        elif player1_distance == closest:
-            return 0
-        elif player2_distance == closest:
-            return 1
+        return 1
+
 class Trap:
     def __init__(self, x, y):
         self.position = [x, y]
         self.turn = 3
         self.colour = (125, 125, 125)
         aoe = []
-        for x in range(-1, 2):
-            for y in range(-1, 2):
-                x_pos = self.position[0] + x
-                y_pos = self.position[1] + y
-                x_pos = check_position(x_pos)
-                y_pos = check_position(y_pos)
-                coords = [x_pos, y_pos]
-                aoe.append(coords)
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                x_pos = check_position(x + dx)
+                y_pos = check_position(y + dy)
+                aoe.append([x_pos, y_pos])
         self.aoe = aoe
 
-def spawn_trap(x_pos, y_pos, traps):   
-    trap = Trap(x_pos, y_pos)
-    traps.append(trap)
+def spawn_trap(x, y, traps):   
+    traps.append(Trap(x, y))
 
 
     
 def ai_turn(players, enemies):
     for enemy in enemies:
-        closest_index = enemy.get_closest_player(players)
-        if enemy.position[0] < players[closest_index].position[0]:
+        target = players[enemy.get_closest_player(players)]
+        if enemy.position[0] < target.position[0]:
             enemy.position[0] += 1
-        elif enemy.position[0] > players[closest_index].position[0]:
+        elif enemy.position[0] > target.position[0]:
             enemy.position[0] -= 1
-        elif enemy.position[1] < players[closest_index].position[1]:
+        elif enemy.position[1] < target.position[1]:
             enemy.position[1] += 1
-        elif enemy.position[1] > players[closest_index].position[1]:
+        elif enemy.position[1] > target.position[1]:
             enemy.position[1] -= 1
 
         enemy.position[0] = check_position(enemy.position[0])
@@ -92,85 +90,89 @@ def check_position(position):
     return max(0, min(7, position))
 
 def is_dead(players, enemies, traps):
-    p1_hit_by_weapon = players[0].position == players[1].weapon
-    p2_hit_by_weapon = players[1].position == players[0].weapon
-
-    p1_hit_by_enemy = False
-    p2_hit_by_enemy = False
-
-    enemies_to_remove = []
-
-    if len(enemies) > 0:
-
-        for enemy in enemies:
-            if enemy.position == players[0].position:
-                p1_hit_by_enemy = True
-            if enemy.position == players[1].position:
-                p2_hit_by_enemy = True
-
-        for enemy in enemies:
-            for player in players:
-                if enemy.position == player.weapon:
-                    enemies_to_remove.append(enemy)
+    p1_enemy, p2_enemy = player_dies_by_enemy(players, enemies)
+    p1_weapon, p2_weapon = player_dies_by_weapon(players)
+    p1_trap, p2_trap = player_dies_by_trap(players, traps)
     
-    p1_in_trap = False
-    p2_in_trap = False
+    handle_enemy_deaths(enemies, players, traps)
 
-    if len(traps) > 0:
-        for trap in traps:
-            if trap.turn <= 0:
-                trap.colour = (255, 255, 255)
-                for pos in trap.aoe:
-                    for enemy in enemies:
-                        if pos == enemy.position:
-                            enemies_to_remove.append(enemy)
-                    p1_in_trap = pos == players[0].position
-                    p2_in_trap = pos == players[1].position
-                    if p1_in_trap or p2_in_trap:
-                        traps.remove(trap)
-                        break
-            else:
-                trap.turn -= 1
-    
-    for enemy in enemies_to_remove:
-        enemies.remove(enemy)
-
-    if p1_hit_by_enemy and p2_hit_by_enemy:
-        players[0].score += 1
-        players[1].score += 1
-        return True, 'draw'
-    elif p1_hit_by_enemy:
-        players[1].score += 3
-        return True, '2'
-    elif p2_hit_by_enemy:
-        players[0].score += 3
-        return True, '1'
-
-    if p1_hit_by_weapon and p2_hit_by_weapon:
-        players[0].score += 1
-        players[1].score += 1
-        return True, 'draw'
-    elif p1_hit_by_weapon:
-        players[1].score += 3
-        return True, '2'
-    elif p2_hit_by_weapon:
-        players[0].score += 3
-        return True, '1'
-    
-    if p1_in_trap and p2_in_trap:
-        players[0].score += 1
-        players[1].score += 1
-        return True, 'draw'
-    elif p1_in_trap:
-        players[1].score += 3
-        return True, '2'
-    elif p2_in_trap:
-        players[0].score += 3
-        return True, '1'
+    result = check_and_score(players, p1_enemy, p2_enemy)
+    if result[0]: 
+        return result
+    result = check_and_score(players, p1_weapon, p2_weapon)
+    if result[0]: 
+        return result
+    result = check_and_score(players, p1_trap, p2_trap)
+    if result[0]: 
+        return result
 
     return False, ''
 
 
+def check_and_score(players, p1_dead, p2_dead):
+    if p1_dead and p2_dead:
+        players[0].score += 1
+        players[1].score += 1
+        return True, 'draw'
+    elif p1_dead:
+        players[1].score += 3
+        return True, '2'
+    elif p2_dead:
+        players[0].score += 3
+        return True, '1'
+    return False, ''
+
+
+def player_dies_by_enemy(players, enemies):
+    p1_hit = False
+    p2_hit = False
+    for enemy in enemies:
+        if enemy.position == players[0].position:
+            p1_hit = True
+        if enemy.position == players[1].position:
+            p2_hit = True
+    return p1_hit, p2_hit
+
+def player_dies_by_weapon(players):
+    p1_hit = players[0].position == players[1].weapon
+    p2_hit = players[1].position == players[0].weapon
+    return p1_hit, p2_hit
+
+
+def player_dies_by_trap(players, traps):
+    p1_trap = False
+    p2_trap = False
+    for trap in traps[:]:
+        if trap.turn == 0:
+            trap.colour = (255, 255, 255)
+            for pos in trap.aoe:
+                if pos == players[0].position:
+                    p1_trap = True
+                if pos == players[1].position:
+                    p2_trap = True
+                if p1_trap or p2_trap:
+                    traps.remove(trap)
+                    break
+        elif trap.turn > 0:
+            trap.turn -= 1
+    return p1_trap, p2_trap
+
+
+def handle_enemy_deaths(enemies, players, traps):
+    enemies_to_remove = []
+    for enemy in enemies:
+        for player in players:
+            if enemy.position == player.weapon:
+                enemies_to_remove.append(enemy)
+    for trap in traps:
+        if trap.turn <= 0:
+            for pos in trap.aoe:
+                for enemy in enemies:
+                    if enemy.position == pos and enemy not in enemies_to_remove:
+                        enemies_to_remove.append(enemy)
+    for enemy in enemies_to_remove:
+        if enemy in enemies:
+            enemies.remove(enemy)
 
 def switch_player(player_turn):
     return 1 - player_turn
@@ -211,11 +213,7 @@ def run_game():
         player1.weapon = [0, 2]
         player2.position = [7, 7]
         player2.weapon = [7, 5]
-        
-        enemy1 = Enemy(0, 7)
-        enemy2 = Enemy(7, 0)
-        enemies = [enemy1, enemy2]
-
+        enemies = [Enemy(0, 7), Enemy(7, 0)]
         traps = []
         
         player_turn = 0
@@ -239,7 +237,6 @@ def run_game():
 
                     if current_player.position == other_player.position:
                         current_player.position = original_position
-                        current_player.fire_weapon(event.direction)
                     else:
                         update_display(players, enemies, traps)
                         dead, winner = is_dead(players, enemies, traps)
@@ -250,8 +247,7 @@ def run_game():
         print("Winner: " + str(winner))
         print("Score - Player 1: " + str(player1.score) + " | Player 2: " + str(player2.score))
 
-        choice = input("Press Enter to play again or type 'exit' to quit: ").strip().lower()
-        if choice == 'exit':
+        if input("Press Enter to play again or type 'exit' to quit: ").strip().lower() == 'exit':
             break
 
     print("\nFinal Scores:")
