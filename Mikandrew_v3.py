@@ -15,7 +15,7 @@ class Enemy:
   def __init__(self, x, y):
     self.position = [x, y]
 
-  def ai(self, player1, player2):
+  def ai(self, player1, player2, enemies):
     pl_x = player1.position[0]
     pl_y = player1.position[1]
     pl2_x = player2.position[0]
@@ -219,7 +219,7 @@ def run_game():
             action += 1
             if action % 4 == 0:
               for enemy in enemies:
-                enemy.ai(player1, player2)
+                enemy.ai(player1, player2, enemies)
             current_player = players[player_turn]
             other_player = players[1 - player_turn]
 
@@ -230,16 +230,17 @@ def run_game():
 
                 if current_player.position == other_player.position:
                     current_player.position = original_position
-                    current_player.fire_weapon(event.direction, traps)
+                    current_player.fire_weapon(event.direction, traps, enemies)
                     
-                update_display(players, enemies)
                 dead, winner = is_dead(players, enemies)
                 if len(traps) != 0:
                   for trap in traps:
                     dead, winner = trap.trap_kill(players)
                     
+                    
                 if not dead:
                   player_turn = switch_player(player_turn)
+                update_display(players, enemies)
 
         print("\n--- Round Over ---")
         print("Winner: " + str(winner))
@@ -255,5 +256,4 @@ def run_game():
     print("Thanks for playing!")
 
 if __name__ == "__main__":
-    run_game()
     run_game()
