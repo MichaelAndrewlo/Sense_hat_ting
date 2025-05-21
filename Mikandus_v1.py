@@ -1,13 +1,14 @@
 from sense_hat import SenseHat
 
 class Player:
-    def __init__(self, x, y, wx, wy, s, colour):
+    def __init__(self, x, y, wx, wy, s, colour, trap_free):
         self.position = [x, y]
         self.weapon = [wx, wy]
         self.score = s
         self.colour = colour
+        self.trap_free = 2
 
-    def move(self, direction):
+    def move(self, direction, traps):
         if direction == 'up':
             self.position[1] -= 1
         elif direction == 'down':
@@ -16,6 +17,9 @@ class Player:
             self.position[0] -= 1
         elif direction == 'right':
             self.position[0] += 1
+        elif direction == 'middle' and self.trap_free > 0:
+            spawn_trap(self, traps)
+            self.trap_free -= 1
         self.position[0] = check_position(self.position[0])
         self.position[1] = check_position(self.position[1])
         self.fire_weapon(direction)
@@ -66,7 +70,7 @@ class Trap:
         aoe.append(coords)
     self.aoe = aoe
   
-  def trap_kill(self, players):
+  def trap_kill(self, players, enemies, traps):
     if self.time < 6:
       self.time += 1  
       return False, ''
@@ -75,15 +79,26 @@ class Trap:
       if players[0].position in self.aoe and players[1].position in self.aoe:
         players[0].score += 1
         players[1].score += 1
+        traps.remove(self)
         return True, 'draw'
       elif players[0].position in self.aoe:
         players[1].score += 3
+        traps.remove(self)
         return True, '2'
       elif players[1].position in self.aoe:
         players[0].score += 3
+        traps.remove(self)
         return True, '1'
-      else:
-        return False, ''
+      return False, ''
+          
+    def enemy_killed(self, enemies, traps):
+        if self.time < 6:
+            pass
+        else:
+            for enemy in enemies:
+                if enemy.position in self.aoe:
+                    enemies.remove(enemy)
+                    traps.remove(self)
 
 def spawn_trap(player, traps):
   x = player.position[0]
@@ -168,8 +183,6 @@ def is_dead(players, enemies):
         return True, '1'
 
     return False, ''
-
-
 
 def switch_player(player_turn):
     return 1 - player_turn
