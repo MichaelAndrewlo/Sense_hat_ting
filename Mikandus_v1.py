@@ -51,19 +51,39 @@ class Enemy(Player):
         elif player2_distance == closest:
             return 1
 class Trap:
-    def __init__(self, x, y):
-        self.position = [x, y]
-        self.turns = 3
-        self.active = False
-    def 
-
-def spawn_trap(players, player_turn, traps):   
-    if player_turn == 0:
-        trap1 = Trap(players[player_turn].get_position()[0], players[player_turn].get_position()[1])
-        traps[0] = trap1
-    elif player_turn == 1:
-        trap2 = Trap(players[player_turn].get_position()[0], players[player_turn].get_position()[1])
-        traps[1] = trap2 
+  def __init__(self, x, y, z):
+    self.position = [x, y]
+    self.time = z
+    self.col = (0, 50, 50)
+    aoe = []
+    for i in range(-1, 2):
+      for x in range(-1, 2):
+        x_pos = self.position[0] + i
+        y_pos = self.position[1] + x
+        x_pos = check_position(x_pos)
+        y_pos = check_position(y_pos)
+        coords = [x_pos, y_pos]
+        aoe.append(coords)
+    self.aoe = aoe
+  
+  def trap_kill(self, players):
+    if self.time < 6:
+      self.time += 1  
+      return False, ''
+    else:
+      self.col = (255, 255, 255)
+      if players[0].position in self.aoe and players[1].position in self.aoe:
+        players[0].score += 1
+        players[1].score += 1
+        return True, 'draw'
+      elif players[0].position in self.aoe:
+        players[1].score += 3
+        return True, '2'
+      elif players[1].position in self.aoe:
+        players[0].score += 3
+        return True, '1'
+      else:
+        return False, ''
 
 
     
