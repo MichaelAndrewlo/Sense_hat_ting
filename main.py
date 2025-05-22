@@ -67,8 +67,6 @@ class Trap:
 
 def spawn_trap(x, y, traps):   
     traps.append(Trap(x, y))
-
-
     
 def ai_turn(players, enemies):
     for enemy in enemies:
@@ -85,7 +83,6 @@ def ai_turn(players, enemies):
         enemy.position[0] = check_position(enemy.position[0])
         enemy.position[1] = check_position(enemy.position[1])
 
-
 def check_position(position):
     return max(0, min(7, position))
 
@@ -93,7 +90,7 @@ def is_dead(players, enemies, traps):
     p1_enemy, p2_enemy = player_dies_by_enemy(players, enemies)
     p1_weapon, p2_weapon = player_dies_by_weapon(players)
     p1_trap, p2_trap = player_dies_by_trap(players, traps)
-    
+
     handle_enemy_deaths(enemies, players, traps)
 
     result = check_and_score(players, p1_enemy, p2_enemy)
@@ -142,13 +139,13 @@ def player_dies_by_weapon(players):
 def player_dies_by_trap(players, traps):
     p1_trap = False
     p2_trap = False
-    for trap in traps[:]:
+    for trap in traps:
         if trap.turn == 0:
             trap.colour = (255, 255, 255)
             for pos in trap.aoe:
                 if pos == players[0].position:
                     p1_trap = True
-                if pos == players[1].position:
+                elif pos == players[1].position:
                     p2_trap = True
                 if p1_trap or p2_trap:
                     traps.remove(trap)
@@ -165,11 +162,12 @@ def handle_enemy_deaths(enemies, players, traps):
             if enemy.position == player.weapon:
                 enemies_to_remove.append(enemy)
     for trap in traps:
-        if trap.turn <= 0:
+        if trap.turn == 0:
             for pos in trap.aoe:
                 for enemy in enemies:
                     if enemy.position == pos and enemy not in enemies_to_remove:
                         enemies_to_remove.append(enemy)
+                        traps.remove(trap)
     for enemy in enemies_to_remove:
         if enemy in enemies:
             enemies.remove(enemy)
@@ -187,19 +185,16 @@ def run_game():
 
     def update_display(players, enemies, traps):
         sense.clear()
-        sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
-        sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)
-        sense.set_pixel(players[0].weapon[0], players[0].weapon[1], red)
-        sense.set_pixel(players[1].weapon[0], players[1].weapon[1], red)
-        
         for enemy in enemies:
             sense.set_pixel(enemy.position[0], enemy.position[1], yellow)
-
         for trap in traps:
             for pos in trap.aoe:
                 sense.set_pixel(pos[0], pos[1], trap.colour)
-
-    
+        sense.set_pixel(players[0].weapon[0], players[0].weapon[1], red)
+        sense.set_pixel(players[1].weapon[0], players[1].weapon[1], red)
+        sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
+        sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)  
+        
     player1 = Player(0, 0, 0, 2, 0, blue)
     player2 = Player(7, 7, 7, 5, 0, green)
     players = [player1, player2]
@@ -227,7 +222,7 @@ def run_game():
             other_player = players[1 - player_turn]
 
             event = sense.stick.wait_for_event()
-            if event.action == 'pressed':
+            if event.action == 'pressed':0
                 if event.direction == 'middle':
                     spawn_trap(current_player.position[0], current_player.position[1], traps)
                 else:
