@@ -222,7 +222,7 @@ def run_game():
             other_player = players[1 - player_turn]
 
             event = sense.stick.wait_for_event()
-            if event.action == 'pressed':0
+            if event.action == 'pressed':
                 if event.direction == 'middle':
                     spawn_trap(current_player.position[0], current_player.position[1], traps)
                 else:
