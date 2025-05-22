@@ -226,7 +226,7 @@ def run_game():
                 if event.direction == 'middle':
                     spawn_trap(current_player.position[0], current_player.position[1], traps)
                 else:
-                    original_position = current_player.position
+                    original_position = current_player.position[:]
                     current_player.move(event.direction)
                     ai_turn(players, enemies)
 
