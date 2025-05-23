@@ -7,7 +7,7 @@ class Player:
         self.score = s
         self.colour = colour
 
-    def move(self, direction):
+    def move(self, direction):# move player in joysticks direction
         if direction == 'up':
             self.position[1] -= 1
         elif direction == 'down':
@@ -20,7 +20,7 @@ class Player:
         self.position[1] = check_position(self.position[1])
         self.fire_weapon(direction)
 
-    def fire_weapon(self, direction):
+    def fire_weapon(self, direction): # place weapon dot 2 spaces infront of player in the direction moved 
         if direction == 'up':
             self.weapon[0] = self.position[0]
             self.weapon[1] = self.position[1] - 2
@@ -40,7 +40,7 @@ class Enemy:
     def __init__(self, x, y):
         self.position = [x, y]
 
-    def get_closest_player(self, players):
+    def get_closest_player(self, players): # finds closest player to the enemy
         def distance(p):
             dx = self.position[0] - p.position[0]
             dy = self.position[1] - p.position[1]
@@ -52,23 +52,23 @@ class Enemy:
             return 0
         return 1
 
-class Trap:
+class Trap: 
     def __init__(self, x, y):
         self.position = [x, y]
         self.turn = 3
         self.colour = (125, 125, 125)
         aoe = []
-        for dx in range(-1, 2):
+        for dx in range(-1, 2): #creaates an area of effect one space in all directions
             for dy in range(-1, 2):
                 x_pos = check_position(x + dx)
                 y_pos = check_position(y + dy)
                 aoe.append([x_pos, y_pos])
         self.aoe = aoe
 
-def spawn_trap(x, y, traps):   
+def spawn_trap(x, y, traps): # creates trap and adds to traps list
     traps.append(Trap(x, y))
     
-def ai_turn(players, enemies):
+def ai_turn(players, enemies): # moves the ai in the direction of the closest player
     for enemy in enemies:
         target = players[enemy.get_closest_player(players)]
         if enemy.position[0] < target.position[0]:
@@ -83,10 +83,10 @@ def ai_turn(players, enemies):
         enemy.position[0] = check_position(enemy.position[0])
         enemy.position[1] = check_position(enemy.position[1])
 
-def check_position(position):
+def check_position(position): # makes sure any position is within the sensehat grid 
     return max(0, min(7, position))
 
-def is_dead(players, enemies, traps):
+def is_dead(players, enemies, traps): # checks if a player, enemy, trap has been eliminated
     p1_enemy, p2_enemy = player_dies_by_enemy(players, enemies)
     p1_weapon, p2_weapon = player_dies_by_weapon(players)
     p1_trap, p2_trap = player_dies_by_trap(players, traps)
@@ -106,7 +106,7 @@ def is_dead(players, enemies, traps):
     return False, ''
 
 
-def check_and_score(players, p1_dead, p2_dead):
+def check_and_score(players, p1_dead, p2_dead): # when a player is killed adds relevant score to players
     if p1_dead and p2_dead:
         players[0].score += 1
         players[1].score += 1
@@ -120,7 +120,7 @@ def check_and_score(players, p1_dead, p2_dead):
     return False, ''
 
 
-def player_dies_by_enemy(players, enemies):
+def player_dies_by_enemy(players, enemies): # check if the player is killed by an enemy
     p1_hit = False
     p2_hit = False
     for enemy in enemies:
@@ -130,13 +130,13 @@ def player_dies_by_enemy(players, enemies):
             p2_hit = True
     return p1_hit, p2_hit
 
-def player_dies_by_weapon(players):
+def player_dies_by_weapon(players): # checks if a player is killed by another players weapon
     p1_hit = players[0].position == players[1].weapon
     p2_hit = players[1].position == players[0].weapon
     return p1_hit, p2_hit
 
 
-def player_dies_by_trap(players, traps):
+def player_dies_by_trap(players, traps): # checks if player is killed by a trap
     p1_trap = False
     p2_trap = False
     for trap in traps:
@@ -155,7 +155,7 @@ def player_dies_by_trap(players, traps):
     return p1_trap, p2_trap
 
 
-def handle_enemy_deaths(enemies, players, traps):
+def handle_enemy_deaths(enemies, players, traps): # checks if enemy is dead and if so removes it
     enemies_to_remove = []
     for enemy in enemies:
         for player in players:
@@ -172,10 +172,10 @@ def handle_enemy_deaths(enemies, players, traps):
         if enemy in enemies:
             enemies.remove(enemy)
 
-def switch_player(player_turn):
+def switch_player(player_turn): # switches player turn
     return 1 - player_turn
 
-def run_game():
+def run_game(): # main game loop
     sense = SenseHat()
 
     red = (255, 0, 0)
@@ -183,13 +183,13 @@ def run_game():
     blue = (0, 0, 255)
     yellow = (255, 255, 0)
 
-    def update_display(players, enemies, traps):
+    def update_display(players, enemies, traps): # updates the sensehat display
         sense.clear()
-        for enemy in enemies:
-            sense.set_pixel(enemy.position[0], enemy.position[1], yellow)
         for trap in traps:
             for pos in trap.aoe:
                 sense.set_pixel(pos[0], pos[1], trap.colour)
+        for enemy in enemies:
+            sense.set_pixel(enemy.position[0], enemy.position[1], yellow)
         sense.set_pixel(players[0].weapon[0], players[0].weapon[1], red)
         sense.set_pixel(players[1].weapon[0], players[1].weapon[1], red)
         sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
