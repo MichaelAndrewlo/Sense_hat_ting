@@ -90,9 +90,7 @@ def is_dead(players, enemies, traps): # checks if a player, enemy, trap has been
     p1_enemy, p2_enemy = player_dies_by_enemy(players, enemies)
     p1_weapon, p2_weapon = player_dies_by_weapon(players)
     p1_trap, p2_trap = player_dies_by_trap(players, traps)
-
     handle_enemy_deaths(enemies, players, traps)
-
     result = check_and_score(players, p1_enemy, p2_enemy)
     if result[0]: 
         return result
@@ -102,7 +100,6 @@ def is_dead(players, enemies, traps): # checks if a player, enemy, trap has been
     result = check_and_score(players, p1_trap, p2_trap)
     if result[0]: 
         return result
-
     return False, ''
 
 
@@ -157,10 +154,12 @@ def player_dies_by_trap(players, traps): # checks if player is killed by a trap
 
 def handle_enemy_deaths(enemies, players, traps): # checks if enemy is dead and if so removes it
     enemies_to_remove = []
+    # checks if enemy is killed by player weapon
     for enemy in enemies:
         for player in players:
             if enemy.position == player.weapon:
                 enemies_to_remove.append(enemy)
+    # checks if enemy is in trap
     for trap in traps:
         if trap.turn == 0:
             for pos in trap.aoe:
@@ -168,6 +167,7 @@ def handle_enemy_deaths(enemies, players, traps): # checks if enemy is dead and 
                     if enemy.position == pos and enemy not in enemies_to_remove:
                         enemies_to_remove.append(enemy)
                         traps.remove(trap)
+    # removes the enemies that are eliminated
     for enemy in enemies_to_remove:
         if enemy in enemies:
             enemies.remove(enemy)
@@ -175,7 +175,7 @@ def handle_enemy_deaths(enemies, players, traps): # checks if enemy is dead and 
 def switch_player(player_turn): # switches player turn
     return 1 - player_turn
 
-def run_game(): # main game loop
+def run_game(): # main game function
     sense = SenseHat()
 
     red = (255, 0, 0)
@@ -194,7 +194,8 @@ def run_game(): # main game loop
         sense.set_pixel(players[1].weapon[0], players[1].weapon[1], red)
         sense.set_pixel(players[0].position[0], players[0].position[1], players[0].colour)
         sense.set_pixel(players[1].position[0], players[1].position[1], players[1].colour)  
-        
+
+    # initialises the classes
     player1 = Player(0, 0, 0, 2, 0, blue)
     player2 = Player(7, 7, 7, 5, 0, green)
     players = [player1, player2]
@@ -203,7 +204,8 @@ def run_game(): # main game loop
     enemy2 = Enemy(7, 0)
     enemies = [enemy1, enemy2]
     
-    while True:
+    while True: # main game loop, every loop is a round
+        # resets after a round
         player1.position = [0, 0]
         player1.weapon = [0, 2]
         player2.position = [7, 7]
@@ -215,37 +217,40 @@ def run_game(): # main game loop
         winner = ''
         dead = False
 
-        update_display(players, enemies, traps)
+        update_display(players, enemies, traps) # updates the sensehat display
 
         while not dead:
-            current_player = players[player_turn]
+            current_player = players[player_turn] 
             other_player = players[1 - player_turn]
 
-            event = sense.stick.wait_for_event()
+            event = sense.stick.wait_for_event() # waits for an event on the joystick
             if event.action == 'pressed':
-                if event.direction == 'middle':
+                if event.direction == 'middle': # spawns trap; does not switch player so same player's move next
                     spawn_trap(current_player.position[0], current_player.position[1], traps)
                 else:
                     original_position = current_player.position[:]
-                    current_player.move(event.direction)
-                    ai_turn(players, enemies)
+                    
+                    current_player.move(event.direction) # moves player
 
-                    if current_player.position == other_player.position:
-                        current_player.position = original_position
-                    else:
-                        update_display(players, enemies, traps)
-                        dead, winner = is_dead(players, enemies, traps)
+                    if current_player.position == other_player.position: # checks if player is in conlfict with other player
+                        current_player.position = original_position # if so, does not update display
+                    else: # only runs if players not in conflict
+                        ai_turn(players, enemies) # moves enemy
+                        update_display(players, enemies, traps) # updates display to show new displays
+                        dead, winner = is_dead(players, enemies, traps) # checks if players and enemies are dead and handles trap function. 
                         if not dead:
-                            player_turn = switch_player(player_turn)
+                            player_turn = switch_player(player_turn) # switches player if NOT dead
+                        else:
+                            break
 
-        print("\n--- Round Over ---")
+        print("\n--- Round Over ---") # displays round over and player scores
         print("Winner: " + str(winner))
         print("Score - Player 1: " + str(player1.score) + " | Player 2: " + str(player2.score))
 
         if input("Press Enter to play again or type 'exit' to quit: ").strip().lower() == 'exit':
             break
 
-    print("\nFinal Scores:")
+    print("\nFinal Scores:") # display final scores
     print("Player 1: " + str(player1.score))
     print("Player 2: " + str(player2.score))
     print("Thanks for playing!")
